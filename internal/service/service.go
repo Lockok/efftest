@@ -86,6 +86,7 @@ func parseSubscriptionDate(value string) (time.Time, error) {
 	}
 
 	layouts := []string{
+		"2006-01",
 		"01-2006",
 		time.DateOnly,
 	}

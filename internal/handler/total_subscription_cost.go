@@ -8,6 +8,19 @@ import (
 	"github.com/google/uuid"
 )
 
+// totalCost godoc
+// @Summary Calculate total subscription cost
+// @Description Calculates the total cost of subscriptions for the selected period with optional filters by user ID and subscription title.
+// @Tags subscriptions
+// @Produce json
+// @Param start query string true "Period start in YYYY-MM format" example(2026-06)
+// @Param end query string true "Period end in YYYY-MM format" example(2026-07)
+// @Param user_id query string false "User UUID"
+// @Param title query string false "Subscription title"
+// @Success 200 {object} TotalCostResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /subscriptions/total [get]
 func (h *SubscriptionHandler) totalCost(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	req := dto.TotalCostRequest{
@@ -32,5 +45,5 @@ func (h *SubscriptionHandler) totalCost(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	writeJSON(w, http.StatusOK, totalCostResponse{TotalCost: total})
+	writeJSON(w, http.StatusOK, TotalCostResponse{TotalCost: total})
 }

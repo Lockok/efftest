@@ -12,5 +12,17 @@ services:
       - pg_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  swagger:
+    build: 
+      context: .
+      dockerfile_inline: |
+        FROM golang:1.25.6-alpine
+        RUN apk add --no-cache git
+        RUN go install github.com/swaggo/swag/cmd/swag@v1.16.6
+        WORKDIR /code
+        ENTRYPOINT ["swag"]
+    volumes:
+       - .:/code
+
 volumes:
   pg_data:

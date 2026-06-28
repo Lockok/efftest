@@ -7,6 +7,16 @@ import (
 	"github.com/google/uuid"
 )
 
+// ListByUserID godoc
+// @Summary List subscriptions by user
+// @Description Returns subscriptions filtered by user ID.
+// @Tags subscriptions
+// @Produce json
+// @Param user_id query string true "User UUID"
+// @Success 200 {array} SubscriptionResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /subscriptions [get]
 func (h *SubscriptionHandler) ListByUserID(w http.ResponseWriter, r *http.Request) {
 	userIDValue := r.URL.Query().Get("user_id")
 	userID, err := uuid.Parse(userIDValue)
@@ -22,7 +32,7 @@ func (h *SubscriptionHandler) ListByUserID(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	response := make([]subscriptionResponse, 0, len(subscriptions))
+	response := make([]SubscriptionResponse, 0, len(subscriptions))
 	for i := range subscriptions {
 		response = append(response, subscriptionToResponse(&subscriptions[i]))
 	}
