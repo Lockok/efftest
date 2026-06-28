@@ -12,6 +12,11 @@ import (
 	"github.com/Lockok/efftest/internal/storage"
 )
 
+// @title Subscriptions API
+// @version 1.0
+// @description REST API FOR MANAGING USER ONLINE SUBSCRIPTIONS AND CALCULATING SUBSCRIPTION COSTS.
+// @host localhost:8080
+// @BasePath /
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,

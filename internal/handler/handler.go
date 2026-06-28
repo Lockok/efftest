@@ -8,10 +8,12 @@ import (
 	"strconv"
 	"time"
 
+	_ "github.com/Lockok/efftest/docs"
 	"github.com/Lockok/efftest/internal/domain"
 	"github.com/Lockok/efftest/internal/repository"
 	"github.com/Lockok/efftest/internal/service"
 	"github.com/google/uuid"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 const maxRequestBodySize = 1 << 20
@@ -20,22 +22,22 @@ type SubscriptionHandler struct {
 	service service.SubscriptionService
 }
 
-type errorResponse struct {
+type ErrorResponse struct {
 	Error string `json:"error"`
-}
+} // @name ErrorResponse
 
-type subscriptionResponse struct {
+type SubscriptionResponse struct {
 	ID        int64     `json:"id"`
 	Title     string    `json:"title"`
 	Price     int       `json:"price"`
 	UserID    uuid.UUID `json:"user_id"`
 	StartDate string    `json:"start_date"`
 	EndDate   string    `json:"end_date,omitempty"`
-}
+} // @name SubscriptionResponse
 
-type totalCostResponse struct {
+type TotalCostResponse struct {
 	TotalCost int `json:"total_cost"`
-}
+} // @name TotalCostResponse
 
 func NewSubscriptionHandler(service service.SubscriptionService) *SubscriptionHandler {
 	return &SubscriptionHandler{
@@ -52,6 +54,7 @@ func (h *SubscriptionHandler) Routes() http.Handler {
 	mux.HandleFunc("GET /subscriptions/{id}", h.GetByID)
 	mux.HandleFunc("PATCH /subscriptions/{id}", h.Update)
 	mux.HandleFunc("DELETE /subscriptions/{id}", h.Delete)
+	mux.Handle("GET /swagger/", httpSwagger.WrapHandler)
 
 	return mux
 }
@@ -109,7 +112,7 @@ func (h *SubscriptionHandler) writeServiceError(w http.ResponseWriter, r *http.R
 }
 
 func writeError(w http.ResponseWriter, status int, message string) {
-	writeJSON(w, status, errorResponse{Error: message})
+	writeJSON(w, status, ErrorResponse{Error: message})
 }
 
 func writeJSON(w http.ResponseWriter, status int, payload any) {
@@ -118,8 +121,8 @@ func writeJSON(w http.ResponseWriter, status int, payload any) {
 	_ = json.NewEncoder(w).Encode(payload)
 }
 
-func subscriptionToResponse(sub *domain.Subscription) subscriptionResponse {
-	response := subscriptionResponse{
+func subscriptionToResponse(sub *domain.Subscription) SubscriptionResponse {
+	response := SubscriptionResponse{
 		ID:        sub.ID,
 		Title:     sub.Title,
 		Price:     sub.Price,
@@ -135,5 +138,5 @@ func subscriptionToResponse(sub *domain.Subscription) subscriptionResponse {
 }
 
 func formatDate(value time.Time) string {
-	return value.Format("01-2006")
+	return value.Format("2006-01")
 }

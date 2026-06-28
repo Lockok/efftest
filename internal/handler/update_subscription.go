@@ -6,6 +6,19 @@ import (
 	"github.com/Lockok/efftest/internal/dto"
 )
 
+// Update godoc
+// @Summary Partially update subscription
+// @Description Updates only fields provided in the request body and returns the full updated subscription.
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param id path int true "Subscription ID"
+// @Param request body dto.UpdateSubscriptionRequest true "Fields to update"
+// @Success 200 {object} SubscriptionResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /subscriptions/{id} [patch]
 func (h *SubscriptionHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, ok := parseID(w, r)
 	if !ok {
