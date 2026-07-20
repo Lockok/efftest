@@ -23,6 +23,7 @@ func main() {
 	}))
 	slog.SetDefault(logger)
 
+
 	cfg, err := config.Load()
 	if err != nil {
 		logger.Error("failed to load config", "error", err)
@@ -40,13 +41,23 @@ func main() {
 	defer pool.Close()
 	logger.Info("postgres connection established", "host", cfg.DB.Host, "port", cfg.DB.Port, "database", cfg.DB.Name)
 
+	mux := http.NewServeMux()
+
 	repo := postgres.NewSubscriptionRepository(pool)
+
+	healthService := service.NewHealthService(pool)
 	subscriptionService := service.NewSubscriptionService(repo)
+	
+	healthHandler := handler.NewHealthHandler(healthService)
 	subscriptionHandler := handler.NewSubscriptionHandler(subscriptionService)
+
+
+	healthHandler.Routes(mux)
+	subscriptionHandler.Routes(mux)
 
 	addr := ":" + cfg.HTTP.Port
 	logger.Info("http server listening", "addr", addr)
-	if err := http.ListenAndServe(addr, subscriptionHandler.Routes()); err != nil {
+	if err := http.ListenAndServe(addr, mux); err != nil {
 		logger.Error("http server stopped", "error", err)
 		os.Exit(1)
 	}

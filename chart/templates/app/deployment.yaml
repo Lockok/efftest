@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ include "efftest.appName" .}}
+  labels:
+    {{- include "efftest.labels" . | nindent 4}}
+
+spec:
+  replicas: {{ .Values.app.replicaCount}}
+
+  selector:
+    matchLabels:
+      {{ include "efftest.selectorLabels" . | nindent 6}}
+
+  template:
+    metadata:
+      labels:
+       {{ include "efftest.selectorLabels" . | nindent 8}}
+
+    spec:
+      containers:
+        - name: efftest
+          image: {{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}
+          imagePullPolicy: Never
+
+          ports:
+            - containerPort: 8080
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          envFrom:
+            - configMapRef:
+                name: {{ include "efftest.configMapName" . }}
+            - secretRef:
+                name: {{ include "efftest.secretName" . }}

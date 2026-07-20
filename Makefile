@@ -1,4 +1,4 @@
-include .env
+-include .env
 
 DSN=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
 
@@ -16,6 +16,12 @@ migrate-down:
 
 migrate-status:
 	goose -dir migrations postgres "$(DSN)" status
+
+deploy:
+	docker build -t efftest:dev .
+	minikube image load efftest:dev
+	helm upgrade dev ./chart
+	kubectl rollout status deployment/dev-app
 
 swagger-gen:
 	@docker compose run --rm swagger \

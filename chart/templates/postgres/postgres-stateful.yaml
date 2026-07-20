@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  name: {{ include "efftest.postgresName" . }}
+  labels:
+  {{- include "efftest.labels" . | nindent 4}}
+
+spec:
+  serviceName: {{ include "efftest.postgresName" . }}
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+    {{- include "efftest.selectorLabels" . | nindent 6}}
+  
+  template:
+    metadata:
+      labels:
+      {{- include "efftest.selectorLabels" . | nindent 8}}
+    
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}
+
+          ports:
+            - containerPort: {{ .Values.postgres.port }}
+
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.postgres.database | quote }}
+            - name: POSTGRES_USER
+              value: {{ .Values.postgres.username | quote }}
+            - name: POSTGRES_PASSWORD 
+              value: {{ .Values.postgres.password | quote }}
+
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data        
+
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        
+        resources:
+          requests:
+            storage: {{ .Values.postgres.storage.size | quote }}
+

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: {{ include "efftest.configMapName" . }}
+  labels:
+{{- include "efftest.labels" . | nindent 4 }}
+
+data:
+  DB_HOST: {{ include "efftest.postgresName" . | quote }}
+  DB_NAME: {{ .Values.postgres.database | quote }}
+  DB_PORT: {{ .Values.postgres.port | quote }}
+  HTTP_PORT: {{ .Values.app.service.targetPort | quote }}

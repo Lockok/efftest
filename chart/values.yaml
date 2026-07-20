@@ -1,0 +1,28 @@
+app:
+  replicaCount: 1
+
+  image:
+    repository: efftest
+    tag: dev
+
+  service:
+    type: NodePort
+    port: 8080
+    targetPort: 8080
+    nodePort: 31817
+
+
+postgres:
+  image:
+    repository: postgres
+    tag: 16
+
+  port: 5432
+  targetPort: 5432
+
+  database: effdb
+  username: postgres
+  password: postgres
+
+  storage:
+    size: 1Gi
