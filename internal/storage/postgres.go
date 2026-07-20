@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 
-
 	"github.com/Lockok/efftest/internal/config"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
