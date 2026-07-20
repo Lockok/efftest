@@ -34,9 +34,6 @@ swagger-gen:
 fmt:
 	gofmt -w cmd internal
 
-fmt-check:
-	@powershell -Command "if ((gofmt -l cmd internal).Length -gt 0) { Write-Host 'Code is not formatted'; gofmt -l cmd internal; exit 1 }"
-
 vet:
 	go vet ./...
 
@@ -49,4 +46,4 @@ test:
 build:
 	go build -o bin/app ./cmd
 
-check: fmt-check vet test build
+check: vet test build

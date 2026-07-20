@@ -29,6 +29,16 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
+      - name: Check formatting
+        shell: bash
+        run: |
+          files=$(gofmt -l .)
+          if [ -n "$files" ]; then
+            echo "The following files are not formatted:"
+            echo "$files"
+            exit 1
+          fi
+
       - name: Run checks
         run: make check 
 
