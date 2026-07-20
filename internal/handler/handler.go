@@ -45,19 +45,26 @@ func NewSubscriptionHandler(service service.SubscriptionService) *SubscriptionHa
 	}
 }
 
-func (h *SubscriptionHandler) Routes() http.Handler {
-	mux := http.NewServeMux()
-
+func (h *SubscriptionHandler) Routes(mux *http.ServeMux) http.Handler {
 	mux.HandleFunc("POST /subscriptions", h.Create)
 	mux.HandleFunc("GET /subscriptions", h.ListByUserID)
 	mux.HandleFunc("GET /subscriptions/total", h.totalCost)
 	mux.HandleFunc("GET /subscriptions/{id}", h.GetByID)
 	mux.HandleFunc("PATCH /subscriptions/{id}", h.Update)
 	mux.HandleFunc("DELETE /subscriptions/{id}", h.Delete)
+
 	mux.Handle("GET /swagger/", httpSwagger.WrapHandler)
 
 	return mux
 }
+
+func (h *HealthHandler) Routes(mux *http.ServeMux) http.Handler {
+	mux.HandleFunc("/health", h.Health)
+	mux.HandleFunc("/ready", h.Ready)
+
+	return mux
+}
+
 
 func parseID(w http.ResponseWriter, r *http.Request) (int64, bool) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
@@ -140,3 +147,4 @@ func subscriptionToResponse(sub *domain.Subscription) SubscriptionResponse {
 func formatDate(value time.Time) string {
 	return value.Format("2006-01")
 }
+

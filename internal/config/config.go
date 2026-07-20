@@ -26,26 +26,62 @@ type DBConfig struct {
 
 func Load() (*Config, error) {
 
-	err := godotenv.Load()
-	if err != nil { 
+	_ = godotenv.Load()
+
+	httpPort, err := requireEnv("HTTP_PORT")
+	if err != nil {
 		return nil, err
 	}
 
+	dbHost, err := requireEnv("DB_HOST")
+	if err != nil {
+		return nil, err
+	}
+
+	dbPort, err := requireEnv("DB_PORT")
+	if err != nil {
+		return nil, err
+	}
+
+	dbUser, err := requireEnv("DB_USER")
+	if err != nil {
+		return nil, err
+	}
+
+	dbPassword, err := requireEnv("DB_PASSWORD")
+	if err != nil {
+		return nil, err
+	}
+
+	dbName, err := requireEnv("DB_NAME")
+	if err != nil {
+		return nil, err
+	}
+
+	
 	cfg := &Config{
 		HTTP: HTTPConfig{
-			Port: os.Getenv("HTTP_PORT"),
+			Port: httpPort,
 		},
 		DB: DBConfig{
-			Host:     os.Getenv("DB_HOST"),
-			Port:     os.Getenv("DB_PORT"),
-			User:    os.Getenv("DB_USER"),
-			Password: os.Getenv("DB_PASSWORD"),
-			Name:     os.Getenv("DB_NAME"),
+			Host:     dbHost,
+			Port:     dbPort,
+			User:    dbUser,
+			Password: dbPassword,
+			Name:     dbName,
 		},
 	}
 
 	return cfg, nil
 
+}
+
+func requireEnv(key string) (string, error) {
+    value := os.Getenv(key)
+    if value == "" {
+        return "", fmt.Errorf("%s is not set", key)
+    }
+    return value, nil
 }
 
 func (db DBConfig) ConnectionString() string {
