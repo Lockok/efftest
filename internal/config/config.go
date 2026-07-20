@@ -58,7 +58,6 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
-	
 	cfg := &Config{
 		HTTP: HTTPConfig{
 			Port: httpPort,
@@ -66,7 +65,7 @@ func Load() (*Config, error) {
 		DB: DBConfig{
 			Host:     dbHost,
 			Port:     dbPort,
-			User:    dbUser,
+			User:     dbUser,
 			Password: dbPassword,
 			Name:     dbName,
 		},
@@ -77,11 +76,11 @@ func Load() (*Config, error) {
 }
 
 func requireEnv(key string) (string, error) {
-    value := os.Getenv(key)
-    if value == "" {
-        return "", fmt.Errorf("%s is not set", key)
-    }
-    return value, nil
+	value := os.Getenv(key)
+	if value == "" {
+		return "", fmt.Errorf("%s is not set", key)
+	}
+	return value, nil
 }
 
 func (db DBConfig) ConnectionString() string {

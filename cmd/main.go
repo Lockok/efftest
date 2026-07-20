@@ -23,7 +23,6 @@ func main() {
 	}))
 	slog.SetDefault(logger)
 
-
 	cfg, err := config.Load()
 	if err != nil {
 		logger.Error("failed to load config", "error", err)
@@ -47,10 +46,9 @@ func main() {
 
 	healthService := service.NewHealthService(pool)
 	subscriptionService := service.NewSubscriptionService(repo)
-	
+
 	healthHandler := handler.NewHealthHandler(healthService)
 	subscriptionHandler := handler.NewSubscriptionHandler(subscriptionService)
-
 
 	healthHandler.Routes(mux)
 	subscriptionHandler.Routes(mux)

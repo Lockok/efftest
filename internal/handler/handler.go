@@ -65,7 +65,6 @@ func (h *HealthHandler) Routes(mux *http.ServeMux) http.Handler {
 	return mux
 }
 
-
 func parseID(w http.ResponseWriter, r *http.Request) (int64, bool) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil || id <= 0 {
@@ -147,4 +146,3 @@ func subscriptionToResponse(sub *domain.Subscription) SubscriptionResponse {
 func formatDate(value time.Time) string {
 	return value.Format("2006-01")
 }
-

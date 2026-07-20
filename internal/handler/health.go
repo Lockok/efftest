@@ -19,10 +19,12 @@ func NewHealthHandler(service service.HealthService) *HealthHandler {
 
 func (h *HealthHandler) Health(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	if _, err := w.Write([]byte("OK")); err != nil {
+		slog.Error("failed to write health response", "error", err)
+	}
 }
 
-func (h *HealthHandler) Ready(w http.ResponseWriter, r *http.Request) {	
+func (h *HealthHandler) Ready(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	err := h.service.Ready(ctx)
 	if err != nil {
