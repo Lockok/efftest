@@ -1,13 +1,18 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/Lockok/efftest/internal/config"
 	"github.com/Lockok/efftest/internal/handler"
 	"github.com/Lockok/efftest/internal/repository/postgres"
+	"github.com/Lockok/efftest/internal/server"
 	"github.com/Lockok/efftest/internal/service"
 	"github.com/Lockok/efftest/internal/storage"
 )
@@ -37,7 +42,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	defer pool.Close()
 	logger.Info("postgres connection established", "host", cfg.DB.Host, "port", cfg.DB.Port, "database", cfg.DB.Name)
 
 	mux := http.NewServeMux()
@@ -54,9 +58,32 @@ func main() {
 	subscriptionHandler.Routes(mux)
 
 	addr := ":" + cfg.HTTP.Port
-	logger.Info("http server listening", "addr", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
-		logger.Error("http server stopped", "error", err)
-		os.Exit(1)
+
+	srv := server.NewServer(addr, mux, logger)
+
+	go func() {
+		if err := srv.Run(); err != nil {
+			logger.Error("failed to start HTTP server", "error:", err)
+			os.Exit(1)
+		}
+	}()
+
+	logger.Info("waiting for shutdown signal")
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	<-ctx.Done()
+
+	logger.Info("shutdown signal received")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		logger.Error("failed to shutdown HTTP server", "error:", err)
 	}
+
+	logger.Info("closing postgres connection")
+	pool.Close()
 }
