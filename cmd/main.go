@@ -11,6 +11,7 @@ import (
 
 	"github.com/Lockok/efftest/internal/config"
 	"github.com/Lockok/efftest/internal/handler"
+	"github.com/Lockok/efftest/internal/middleware"
 	"github.com/Lockok/efftest/internal/repository/postgres"
 	"github.com/Lockok/efftest/internal/server"
 	"github.com/Lockok/efftest/internal/service"
@@ -57,9 +58,15 @@ func main() {
 	healthHandler.Routes(mux)
 	subscriptionHandler.Routes(mux)
 
+	handler := middleware.RequestID()(
+		middleware.Logging(logger)(
+			middleware.Recovery(logger)(mux),
+		),
+	)
+
 	addr := ":" + cfg.HTTP.Port
 
-	srv := server.NewServer(addr, mux, logger)
+	srv := server.NewServer(addr, handler, logger)
 
 	go func() {
 		if err := srv.Run(); err != nil {
